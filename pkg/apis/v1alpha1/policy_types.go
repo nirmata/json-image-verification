@@ -8,9 +8,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-var (
-	multipleAttestorError = fmt.Errorf("mutliple attestor cannot be added in the same entry")
-)
+var multipleAttestorError = fmt.Errorf("multiple attestor cannot be added in the same entry")
 
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -177,7 +175,7 @@ type Attestation struct {
 func (v *VerificationRule) Validate() error {
 	for _, v := range v.Cosign {
 		if v != nil {
-			attestorAlreadyExists := false
+			var attestorAlreadyExists bool
 			if v.Key != nil {
 				if attestorAlreadyExists {
 					return multipleAttestorError
