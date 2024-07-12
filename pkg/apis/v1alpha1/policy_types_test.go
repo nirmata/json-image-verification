@@ -26,22 +26,22 @@ func Test_VerificationPolicyValidation(t *testing.T) {
 		{
 			name:   "cosign both key and keyless",
 			policy: `{"imageReferences":"*","cosign":[{"key":{"publicKey":""},"keyless":{"issuer":"","subject":"","root":""}}]}`,
-			err:    multipleAttestorError,
+			err:    errMultipleAttestor,
 		},
 		{
 			name:   "cosign both key and cert",
 			policy: `{"imageReferences":"*","cosign":[{"key":{"publicKey":""},"certificate":{"cert":"","certChain":""}}]}`,
-			err:    multipleAttestorError,
+			err:    errMultipleAttestor,
 		},
 		{
 			name:   "cosign both keyless and certificate",
 			policy: `{"imageReferences":"*","cosign":[{"keyless":{"issuer":"","subject":"","root":""},"certificate":{"cert":"","certChain":""}}]}`,
-			err:    multipleAttestorError,
+			err:    errMultipleAttestor,
 		},
 		{
 			name:   "cosign key, keyless and certificate",
 			policy: `{"imageReferences":"*","cosign":[{"key":{"publicKey":""},"keyless":{"issuer":"","subject":"","root":""},"certificate":{"cert":"","certChain":""}}]}`,
-			err:    multipleAttestorError,
+			err:    errMultipleAttestor,
 		},
 	}
 
