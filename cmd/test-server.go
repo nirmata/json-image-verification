@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"time"
 
 	"github.com/nirmata/kyverno-notation-verifier/pkg/types"
 )
@@ -13,8 +14,9 @@ func server() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", echo)
 	srv := &http.Server{
-		Addr:    "127.0.0.1:3000",
-		Handler: mux,
+		Addr:              "127.0.0.1:3000",
+		Handler:           mux,
+		ReadHeaderTimeout: 30 * time.Second,
 	}
 
 	fmt.Println("server started at", srv.Addr)
@@ -46,7 +48,11 @@ func echo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data, err := json.MarshalIndent(requestData, "", " ")
-	fmt.Printf("Request recieved with data=%+v\n", string(data))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Printf("Request received with data=%+v\n", string(data))
 
 	var resp types.ResponseData
 	resp.Verified = true
@@ -58,5 +64,8 @@ func echo(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("Sending response %s\n", string(data))
 	w.WriteHeader(http.StatusOK)
-	w.Write(data)
+	_, err = w.Write(data)
+	if err != nil {
+		panic(err)
+	}
 }
