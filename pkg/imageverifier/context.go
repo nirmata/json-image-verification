@@ -44,6 +44,7 @@ func addContextEntriesToJsonContext(ctx enginectx.Interface, client dclient.Inte
 	for _, entry := range *entries {
 		if entry.Variable != nil {
 			ctxEntry := kyvernov1.ContextEntry{
+				Name:     entry.Name,
 				Variable: entry.Variable,
 			}
 			ldr := loaders.NewVariableLoader(logr.Discard(), ctxEntry, ctx, jp)
@@ -53,6 +54,7 @@ func addContextEntriesToJsonContext(ctx enginectx.Interface, client dclient.Inte
 			}
 		} else if entry.APICall != nil {
 			ctxEntry := kyvernov1.ContextEntry{
+				Name:    entry.Name,
 				APICall: entry.APICall,
 			}
 			ldr := loaders.NewAPILoader(context.TODO(), logr.Discard(), ctxEntry, ctx, jp, client, apicall.APICallConfiguration{})

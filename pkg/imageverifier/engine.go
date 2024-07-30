@@ -2,6 +2,7 @@ package imageverifier
 
 import (
 	"context"
+	"time"
 
 	"github.com/kyverno/kyverno/pkg/clients/dclient"
 	"github.com/kyverno/kyverno/pkg/config"
@@ -9,6 +10,8 @@ import (
 	"github.com/kyverno/kyverno/pkg/engine/jmespath"
 	"github.com/nirmata/json-image-verification/pkg/apis/v1alpha1"
 	"github.com/nirmata/json-image-verification/pkg/policy"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
 )
 
 type engine struct {
@@ -57,7 +60,17 @@ const (
 	ERROR VerificationOutcome = "ERROR"
 )
 
-func NewEngine(client dclient.Interface) *engine {
+func NewEngine(ctx context.Context, kubeClient kubernetes.Interface, dynamicClient dynamic.Interface) (*engine, error) {
+	client, err := dclient.NewClient(ctx, dynamicClient, kubeClient, 15*time.Second)
+	if err != nil {
+		return nil, err
+	}
+	return &engine{
+		client: client,
+	}, nil
+}
+
+func NewEngineFromDClient(client dclient.Interface) *engine {
 	return &engine{
 		client: client,
 	}
