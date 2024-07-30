@@ -132,7 +132,7 @@ func (e *engine) Apply(request Request) Response {
 				continue
 			}
 
-			rule, err := substituteVariablesInRule(&r, jsonContext)
+			rule, err := substituteVariablesInRule(r.DeepCopy(), jsonContext)
 			if err != nil {
 				ruleResponse.VerificationResult = VerificationResult{
 					VerificationOutcome: ERROR,

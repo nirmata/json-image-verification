@@ -37,6 +37,10 @@ func addResourceToJsonContext(ctx enginectx.Interface, resource interface{}) err
 }
 
 func addContextEntriesToJsonContext(ctx enginectx.Interface, client dclient.Interface, jp jmespath.Interface, entries *[]v1alpha1.ContextEntry) error {
+	if entries == nil {
+		return nil
+	}
+
 	for _, entry := range *entries {
 		if entry.Variable != nil {
 			ctxEntry := kyvernov1.ContextEntry{
