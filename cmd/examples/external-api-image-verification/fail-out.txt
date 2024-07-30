@@ -1,0 +1,6 @@
+Verification Result:
+Results for policy: test
+Results for rule: external-api
+Verifying image: ghcr.io/kyverno/test-verify-image:signed, result: FAIL
+Failures:
+verification checks failed for ghcr.io/kyverno/test-verify-image:signed: aws signer verification failed

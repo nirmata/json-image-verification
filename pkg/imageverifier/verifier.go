@@ -192,7 +192,7 @@ func (i *imageVerifier) externalServiceVerification(pol *v1alpha1.ExternalServic
 		return nil
 	}
 
-	data, err := executor.Fetch(context.TODO())
+	data, err := executor.Execute(context.TODO(), pol.APICall)
 	if err != nil {
 		return err
 	}

@@ -7,11 +7,12 @@ require (
 	github.com/kyverno/kyverno v1.12.4
 	github.com/kyverno/kyverno-json v0.0.4-0.20240610001259-69a4a1ffcd55
 	github.com/kyverno/pkg/ext v0.0.0-20240418121121-df8add26c55c
+	github.com/nirmata/kyverno-notation-verifier v1.0.2-0.20240428070844-49deec0c8220
 	github.com/stretchr/testify v1.9.0
 	gotest.tools v2.2.0+incompatible
 	k8s.io/apimachinery v0.30.1
 	k8s.io/client-go v0.30.1
-	sigs.k8s.io/controller-runtime v0.17.1
+	sigs.k8s.io/controller-runtime v0.18.2
 	sigs.k8s.io/kubectl-validate v0.0.4
 )
 
@@ -328,7 +329,7 @@ require (
 	k8s.io/kubectl v0.29.2 // indirect
 	k8s.io/pod-security-admission v0.30.1 // indirect
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e // indirect
-	oras.land/oras-go/v2 v2.3.1 // indirect
+	oras.land/oras-go/v2 v2.5.0 // indirect
 	sigs.k8s.io/apiserver-network-proxy/konnectivity-client v0.29.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
 	sigs.k8s.io/kustomize/api v0.16.0 // indirect

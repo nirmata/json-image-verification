@@ -10,6 +10,8 @@ import (
 )
 
 func Test_Verify(t *testing.T) {
+	// start server to test external api
+	go server()
 	tests := []struct {
 		name         string
 		policyPath   string
@@ -64,6 +66,20 @@ func Test_Verify(t *testing.T) {
 			policyPath:   "./examples/notary-image-verification/policy.yaml",
 			resourcePath: "./examples/notary-image-verification/bad-payload.json",
 			outputPath:   "./examples/notary-image-verification/bad-out.txt",
+		},
+		{
+			name:         "external api test",
+			policyPath:   "./examples/external-api-image-verification/policy.yaml",
+			resourcePath: "./examples/external-api-image-verification/payload.json",
+			outputPath:   "./examples/external-api-image-verification/out.txt",
+			fail:         false,
+		},
+		{
+			name:         "external api test",
+			policyPath:   "./examples/external-api-image-verification/fail-policy.yaml",
+			resourcePath: "./examples/external-api-image-verification/payload.json",
+			outputPath:   "./examples/external-api-image-verification/fail-out.txt",
+			fail:         false,
 		},
 		{
 			name:         "wrong output test",

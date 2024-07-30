@@ -87,6 +87,7 @@ func (e *engine) Apply(request Request) Response {
 					VerificationOutcome: ERROR,
 					Error:               err,
 				}
+				policyResponse.RuleResponses[j] = ruleResponse
 				continue
 			}
 
@@ -96,12 +97,14 @@ func (e *engine) Apply(request Request) Response {
 					VerificationOutcome: ERROR,
 					Error:               err,
 				}
+				policyResponse.RuleResponses[j] = ruleResponse
 				continue
 			}
 			if len(errs) > 0 {
 				ruleResponse.VerificationResult = VerificationResult{
 					VerificationOutcome: SKIP,
 				}
+				policyResponse.RuleResponses[j] = ruleResponse
 				continue
 			}
 
@@ -111,6 +114,7 @@ func (e *engine) Apply(request Request) Response {
 					VerificationOutcome: ERROR,
 					Error:               err,
 				}
+				policyResponse.RuleResponses[j] = ruleResponse
 				continue
 			}
 
@@ -120,6 +124,7 @@ func (e *engine) Apply(request Request) Response {
 					VerificationOutcome: ERROR,
 					Error:               err,
 				}
+				policyResponse.RuleResponses[j] = ruleResponse
 				continue
 			}
 
@@ -129,6 +134,7 @@ func (e *engine) Apply(request Request) Response {
 					VerificationOutcome: ERROR,
 					Error:               err,
 				}
+				policyResponse.RuleResponses[j] = ruleResponse
 				continue
 			}
 
@@ -138,6 +144,7 @@ func (e *engine) Apply(request Request) Response {
 					VerificationOutcome: ERROR,
 					Error:               err,
 				}
+				policyResponse.RuleResponses[j] = ruleResponse
 				continue
 			}
 
