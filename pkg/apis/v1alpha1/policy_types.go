@@ -48,8 +48,26 @@ type ImageVerificationRule struct {
 	Match          v1alpha1.Match        `json:"match"`
 	ImageExtractor ImageExtractorConfigs `json:"imageExtractors"`
 	// +optional
+	Context *[]ContextEntry `json:"context,omitempty"`
+	// +optional
 	RequiredCount int               `json:"count"`
 	Rules         VerificationRules `json:"verify"`
+}
+
+// ContextEntry adds variables and data sources to a rule Context. Either a
+// ConfigMap reference or a APILookup must be provided.
+type ContextEntry struct {
+	// Name is the variable name.
+	Name string `json:"name,omitempty" yaml:"name,omitempty"`
+
+	// APICall is an HTTP request to the Kubernetes API server, or other JSON web service.
+	// The data returned is stored in the context with the name for the context entry.
+	// +optional
+	APICall *kyvernov1.ContextAPICall `json:"apiCall,omitempty" yaml:"apiCall,omitempty"`
+
+	// Variable defines an arbitrary JMESPath context variable that can be defined inline.
+	// +optional
+	Variable *kyvernov1.Variable `json:"variable,omitempty" yaml:"variable,omitempty"`
 }
 
 type ImageExtractorConfigs []ImageExtractorConfig
@@ -96,6 +114,10 @@ type VerificationRule struct {
 	// Notary is an array of attributes used to verify notary signatures
 	// +optional
 	Notary []*Notary `json:"notary,omitempty"`
+
+	// ExternalService is an array of attributes used to verify image signatures using API call
+	// +optional
+	ExternalService []*ExternalService `json:"externalService,omitempty"`
 }
 
 // Cosign is a set of attributes used to verify cosign signatures
@@ -162,6 +184,13 @@ type Notary struct {
 	Certs string `json:"certs"`
 	// +optional
 	Attestations []*Attestation `json:"attestations"`
+}
+
+// ExternalService is a set of attributes used to make API calls for image verification
+type ExternalService struct {
+	APICall *kyvernov1.ContextAPICall `json:"apiCall,omitempty" yaml:"apiCall,omitempty"`
+	// +optional
+	Conditions []kyvernov1.AnyAllConditions `json:"conditions,omitempty" yaml:"conditions,omitempty"`
 }
 
 type Attestation struct {

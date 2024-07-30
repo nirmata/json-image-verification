@@ -4,10 +4,15 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/kyverno/kyverno/pkg/config"
+	enginecontext "github.com/kyverno/kyverno/pkg/engine/context"
+	"github.com/kyverno/kyverno/pkg/engine/jmespath"
 	"github.com/nirmata/json-image-verification/pkg/apis/v1alpha1"
 )
 
 func Test_Verifier(t *testing.T) {
+	jp := jmespath.New(config.NewDefaultConfiguration(false))
+	jsonContext := enginecontext.NewContext(jp)
 	tests := []struct {
 		name        string
 		rules       string
@@ -77,7 +82,7 @@ func Test_Verifier(t *testing.T) {
 				t.Fatalf("failed to unmarshal rules: %v", err)
 			}
 
-			verifier := NewVerifier(ivRules, 1)
+			verifier := NewVerifier(ivRules, nil, jsonContext, jp, 1)
 			if resp := verifier.Verify(tt.image); resp.VerificationOutcome != tt.wantOutcome {
 				t.Errorf("verifier test failed, want: %v, got: %v", tt.wantOutcome, resp.VerificationOutcome)
 				for _, r := range resp.VerificationResponses {

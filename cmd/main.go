@@ -37,7 +37,7 @@ func verify(out io.Writer, resourcePath, policyPath string) {
 		panic(err)
 	}
 
-	verifier := imageverifier.NewEngine()
+	verifier := imageverifier.NewEngine(nil)
 	request := imageverifier.Request{
 		Policies: pol,
 		Resource: resource,

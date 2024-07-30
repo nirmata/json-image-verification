@@ -2,12 +2,15 @@ package imageverifier
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
+	"github.com/go-logr/logr"
 	kyvernov1 "github.com/kyverno/kyverno/api/kyverno/v1"
 	"github.com/kyverno/kyverno/ext/wildcard"
-	"github.com/kyverno/kyverno/pkg/config"
+	"github.com/kyverno/kyverno/pkg/clients/dclient"
 	"github.com/kyverno/kyverno/pkg/cosign"
+	"github.com/kyverno/kyverno/pkg/engine/apicall"
 	enginecontext "github.com/kyverno/kyverno/pkg/engine/context"
 	"github.com/kyverno/kyverno/pkg/engine/jmespath"
 	"github.com/kyverno/kyverno/pkg/engine/variables"
@@ -19,18 +22,22 @@ import (
 
 type imageVerifier struct {
 	count          int
+	client         dclient.Interface
 	rules          v1alpha1.VerificationRules
 	cosignVerifier images.ImageVerifier
 	notaryVerifier images.ImageVerifier
 	jsonCtx        enginecontext.Interface
+	jp             jmespath.Interface
 }
 
-func NewVerifier(rules v1alpha1.VerificationRules, count int) *imageVerifier {
+func NewVerifier(rules v1alpha1.VerificationRules, client dclient.Interface, jsonCtx enginecontext.Interface, jp jmespath.Interface, count int) *imageVerifier {
 	if count <= 0 { // either not defined or illegal value
 		count = len(rules)
 	}
 	return &imageVerifier{
-		jsonCtx:        enginecontext.NewContext(jmespath.New(config.NewDefaultConfiguration(false))),
+		jp:             jp,
+		client:         client,
+		jsonCtx:        jsonCtx,
 		count:          count,
 		rules:          rules,
 		cosignVerifier: cosign.NewVerifier(),
@@ -74,6 +81,18 @@ func (i *imageVerifier) Verify(image string) VerificationResult {
 			}
 
 			err := i.notaryVerification(notaryPolicy, image)
+			if err != nil {
+				verificationResp.Failures = append(verificationResp.Failures, err)
+				continue
+			}
+		}
+
+		for _, externalPolicy := range policy.ExternalService {
+			if externalPolicy == nil {
+				continue
+			}
+
+			err := i.externalServiceVerification(externalPolicy, image)
 			if err != nil {
 				verificationResp.Failures = append(verificationResp.Failures, err)
 				continue
@@ -155,6 +174,61 @@ func (i *imageVerifier) notaryVerification(pol *v1alpha1.Notary, image string) e
 			return fmt.Errorf("attestation checks failed for %s and predicate %s: %s", image, att.Type, msg)
 		}
 	}
+	return nil
+}
+
+func (i *imageVerifier) externalServiceVerification(pol *v1alpha1.ExternalService, image string) error {
+	executor, err := apicall.New(
+		logr.Discard(),
+		i.jp,
+		kyvernov1.ContextEntry{
+			APICall: pol.APICall,
+		},
+		i.jsonCtx,
+		i.client,
+		apicall.APICallConfiguration{},
+	)
+	if err != nil {
+		return nil
+	}
+
+	data, err := executor.Fetch(context.TODO())
+	if err != nil {
+		return err
+	}
+
+	var jsonData interface{}
+	err = json.Unmarshal(data, &jsonData)
+	if err != nil {
+		return err
+	}
+
+	dataMap := make(map[string]interface{})
+	if m, ok := jsonData.(map[string]interface{}); ok {
+		dataMap = m
+	} else {
+		dataMap["response"] = jsonData
+	}
+
+	i.jsonCtx.Checkpoint()
+	defer i.jsonCtx.Restore()
+	if err := enginecontext.AddJSONObject(i.jsonCtx, dataMap); err != nil {
+		return fmt.Errorf("failed to add response to the context: %w", err)
+	}
+
+	c, err := variables.SubstituteAllInConditions(logr.Discard(), i.jsonCtx, pol.Conditions)
+	if err != nil {
+		return fmt.Errorf("failed to substitute variables in attestation conditions: %w", err)
+	}
+
+	val, msg, err := variables.EvaluateAnyAllConditions(logr.Discard(), i.jsonCtx, c)
+	if err != nil {
+		return fmt.Errorf("failed to verify image: %w", err)
+	}
+	if !val {
+		return fmt.Errorf("verification checks failed for %s: %s", image, msg)
+	}
+
 	return nil
 }
 
