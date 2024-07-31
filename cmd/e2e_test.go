@@ -75,10 +75,24 @@ func Test_Verify(t *testing.T) {
 			fail:         false,
 		},
 		{
-			name:         "external api test",
+			name:         "external api test fail",
 			policyPath:   "./examples/external-api-image-verification/fail-policy.yaml",
 			resourcePath: "./examples/external-api-image-verification/payload.json",
 			outputPath:   "./examples/external-api-image-verification/fail-out.txt",
+			fail:         false,
+		},
+		{
+			name:         "external api test context entry",
+			policyPath:   "./examples/external-api-image-verification/policy-api-call.yaml",
+			resourcePath: "./examples/external-api-image-verification/payload.json",
+			outputPath:   "./examples/external-api-image-verification/api-call-out.txt",
+			fail:         false,
+		},
+		{
+			name:         "external api test context entry error",
+			policyPath:   "./examples/external-api-image-verification/policy-api-call-err.yaml",
+			resourcePath: "./examples/external-api-image-verification/payload.json",
+			outputPath:   "./examples/external-api-image-verification/api-call-err-out.txt",
 			fail:         false,
 		},
 		{

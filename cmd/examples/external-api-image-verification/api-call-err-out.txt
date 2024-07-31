@@ -1,0 +1,6 @@
+Verification Result:
+Results for policy: test
+Results for rule: external-api
+Verifying image: , result: ERROR
+Error encountered: failed to fetch data for APICall: HTTP 406 Not Acceptable: no images were provided
+

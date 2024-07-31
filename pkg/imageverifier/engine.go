@@ -121,16 +121,6 @@ func (e *engine) Apply(request Request) Response {
 				continue
 			}
 
-			err = addContextEntriesToJsonContext(jsonContext, e.client, jp, r.Context)
-			if err != nil {
-				ruleResponse.VerificationResult = VerificationResult{
-					VerificationOutcome: ERROR,
-					Error:               err,
-				}
-				policyResponse.RuleResponses[j] = ruleResponse
-				continue
-			}
-
 			images, err := policy.GetImages(request.Resource, r.ImageExtractor)
 			if err != nil {
 				ruleResponse.VerificationResult = VerificationResult{
@@ -142,6 +132,16 @@ func (e *engine) Apply(request Request) Response {
 			}
 
 			err = addImagesToJsonContext(jsonContext, images)
+			if err != nil {
+				ruleResponse.VerificationResult = VerificationResult{
+					VerificationOutcome: ERROR,
+					Error:               err,
+				}
+				policyResponse.RuleResponses[j] = ruleResponse
+				continue
+			}
+
+			err = addContextEntriesToJsonContext(jsonContext, e.client, jp, r.Context)
 			if err != nil {
 				ruleResponse.VerificationResult = VerificationResult{
 					VerificationOutcome: ERROR,
